@@ -57,6 +57,42 @@ defmodule Servy.Handler do
     %{ conv | resp_body: "Oliver" }
   end
 
+  def route(%{ method: "GET", path: "/about" } = conv) do
+    Path.expand("../../pages", __DIR__)
+    |> Path.join("about.html")
+    |> File.read
+    |> handle_file(conv)
+  end
+
+  def handle_file({:ok, content}, conv) do
+    %{ conv | resp_body: content }
+  end
+
+  def handle_file({:error, :enoent}, conv) do
+    %{ conv | status: 404, resp_body: "File not found!" }
+  end
+
+  def handle_file({:error, reason}, conv) do
+    %{ conv | status: 500, resp_body: "File error: #{reason}" }
+  end
+
+  # def route(%{ method: "GET", path: "/about" } = conv) do
+  #   file =
+  #     Path.expand("../../pages", __DIR__)
+  #     |> Path.join("about.html")
+  #
+  #   case File.read(file) do
+  #     {:ok, content} ->
+  #       %{ conv | resp_body: content }
+  #
+  #     {:error, :enoent} ->
+  #       %{ conv | status: 404, resp_body: "File not found!" }
+  #
+  #     {:error, reason} ->
+  #       %{ conv | status: 500, resp_body: "File error: #{reason}" }
+  #   end
+  # end
+
   def route(%{ path: path } = conv) do
     %{ conv | status: 404, resp_body: "No #{path} here!" }
   end
@@ -124,6 +160,19 @@ IO.puts response
 
 request = """
 GET /wildlife HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts response
+
+
+request = """
+GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
