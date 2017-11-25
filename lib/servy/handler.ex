@@ -2,10 +2,25 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> rewrite_path
     |> log
     |> route
+    |> track
     |> format_response
   end
+
+  def track(%{status: 404, path: path} = conv) do
+    IO.puts "Warning: #{path} is on the loose!"
+    conv # conversation map needs to keep flowing thru pipeline
+  end
+
+  def track(conv), do: conv # default conv map
+
+  def rewrite_path(%{path: "/wildlife"} = conv) do
+    %{ conv | path: "/wildthings" }
+  end
+
+  def rewrite_path(conv), do: conv
 
   def log(conv), do: IO.inspect conv # one line func
 
@@ -21,25 +36,28 @@ defmodule Servy.Handler do
        resp_body: "" }
   end
 
-  def route(conv) do
-    route(conv, conv.method, conv.path)
+  # def route(conv) do
+  #   route(conv, conv.method, conv.path)
+  # end
+
+  def route(%{ method: "GET", path: "/wildthings" } = conv) do
+    %{ conv | resp_body: "Wild things path" }
   end
 
-  # two function clauses for route func:
-  def route(conv, "GET", "/family") do
+  def route(%{ method: "GET", path: "/family" } = conv) do
     # creates a new map that also has response body:
     %{ conv | resp_body: "Jane, Oliver, Elly, Terry, Anne" }
   end
 
-  def route(conv, "GET", "/dogs") do
-    %{ conv | resp_body: "Oliver" }
-  end
-
-  def route(conv, "GET", "/family/" <> id) do
+  def route(%{ method: "GET", path: "/family/" <> id } = conv) do
     %{ conv | resp_body: "Family member number: #{id}" }
   end
 
-  def route(conv, _method, path) do
+  def route(%{ method: "GET", path: "/dogs" } = conv) do
+    %{ conv | resp_body: "Oliver" }
+  end
+
+  def route(%{ path: path } = conv) do
     %{ conv | status: 404, resp_body: "No #{path} here!" }
   end
 
@@ -93,6 +111,19 @@ IO.puts response
 
 request = """
 GET /bigfoot HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts response
+
+
+request = """
+GET /wildlife HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
