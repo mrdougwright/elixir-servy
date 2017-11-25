@@ -2,37 +2,97 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> log
     |> route
     |> format_response
   end
 
+  def log(conv), do: IO.inspect conv # one line func
+
   def parse(request) do
     [method, path, _] =
-       request
-       |> String.split("\n")
-       |> List.first
-       |> String.split(" ")
-    %{ method: method, path: path, resp_body: "" }
+      request
+      |> String.split("\n")
+      |> List.first
+      |> String.split(" ")
+    %{ method: method,
+       path: path,
+       status: 200,
+       resp_body: "" }
   end
 
   def route(conv) do
+    route(conv, conv.method, conv.path)
+  end
+
+  # two function clauses for route func:
+  def route(conv, "GET", "/family") do
     # creates a new map that also has response body:
     %{ conv | resp_body: "Jane, Oliver, Elly, Terry, Anne" }
   end
 
+  def route(conv, "GET", "/dogs") do
+    %{ conv | resp_body: "Oliver" }
+  end
+
+  def route(conv, "GET", "/family/" <> id) do
+    %{ conv | resp_body: "Family member number: #{id}" }
+  end
+
+  def route(conv, _method, path) do
+    %{ conv | status: 404, resp_body: "No #{path} here!" }
+  end
+
   def format_response(conv) do
     """
-    HTTP/1.1 200 OK
+    HTTP/1.1 #{conv.status} #{status_reason(conv.status)}
     Content-Type: text/html
     Content-Length: #{byte_size(conv.resp_body)}
 
     #{conv.resp_body}
     """
-  end # Content-Length: #{String.length(conv.resp_body)} <- less accurate byte count
+  end
+
+  defp status_reason(code) do
+    %{
+      200 => "OK",
+      201 => "Created",
+      401 => "Unauthorized",
+      403 => "Forbidden",
+      404 => "Not Found",
+      500 => "Internal Server Error"
+    }[code]
+  end
 end
 
 request = """
 GET /family HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts response
+
+
+request = """
+GET /family/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = Servy.Handler.handle(request)
+
+IO.puts response
+
+
+request = """
+GET /bigfoot HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
