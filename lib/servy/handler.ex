@@ -1,4 +1,9 @@
 defmodule Servy.Handler do
+  @moduledoc "Handles HTTP requests."
+
+  @pages_path Path.expand("../../pages", __DIR__)
+
+  @doc "Transforms the request into a response."
   def handle(request) do
     request
     |> parse
@@ -9,6 +14,7 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  @doc "Logs 404 requests"
   def track(%{status: 404, path: path} = conv) do
     IO.puts "Warning: #{path} is on the loose!"
     conv # conversation map needs to keep flowing thru pipeline
@@ -36,10 +42,6 @@ defmodule Servy.Handler do
        resp_body: "" }
   end
 
-  # def route(conv) do
-  #   route(conv, conv.method, conv.path)
-  # end
-
   def route(%{ method: "GET", path: "/wildthings" } = conv) do
     %{ conv | resp_body: "Wild things path" }
   end
@@ -58,7 +60,7 @@ defmodule Servy.Handler do
   end
 
   def route(%{ method: "GET", path: "/about" } = conv) do
-    Path.expand("../../pages", __DIR__)
+    @pages_path
     |> Path.join("about.html")
     |> File.read
     |> handle_file(conv)
@@ -75,23 +77,6 @@ defmodule Servy.Handler do
   def handle_file({:error, reason}, conv) do
     %{ conv | status: 500, resp_body: "File error: #{reason}" }
   end
-
-  # def route(%{ method: "GET", path: "/about" } = conv) do
-  #   file =
-  #     Path.expand("../../pages", __DIR__)
-  #     |> Path.join("about.html")
-  #
-  #   case File.read(file) do
-  #     {:ok, content} ->
-  #       %{ conv | resp_body: content }
-  #
-  #     {:error, :enoent} ->
-  #       %{ conv | status: 404, resp_body: "File not found!" }
-  #
-  #     {:error, reason} ->
-  #       %{ conv | status: 500, resp_body: "File error: #{reason}" }
-  #   end
-  # end
 
   def route(%{ path: path } = conv) do
     %{ conv | status: 404, resp_body: "No #{path} here!" }
