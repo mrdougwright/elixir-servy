@@ -14,7 +14,6 @@ defmodule Servy.BearController do
 
   def show(conv, %{"id" => id}) do
     bear = Wildthings.get_bear(id)
-
     render(conv, "show.eex", bear: bear)
   end
 
