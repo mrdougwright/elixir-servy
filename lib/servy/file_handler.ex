@@ -2,7 +2,7 @@ defmodule Servy.FileHandler do
 
   @doc "Handle file content"
   def handle_file({:ok, content}, conv) do
-    %{ conv | resp_body: content }
+    %{ conv | status: 200, resp_body: content }
   end
 
   def handle_file({:error, :enoent}, conv) do
