@@ -19,3 +19,18 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/servy](https://hexdocs.pm/servy).
 
+## To Run
+
+From command line within Servy directory, enter an iex shell.
+Call HttpServer start function with any port:
+
+```elixir
+$ iex -S mix
+> Servy.HttpServer.start(4000)
+```
+
+Or spawn the process within iex:
+
+```elixir
+  spawn(Servy.HttpServer, :start, [4000])
+```
