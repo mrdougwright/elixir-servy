@@ -32,5 +32,19 @@ $ iex -S mix
 Or spawn the process within iex:
 
 ```elixir
-  spawn(Servy.HttpServer, :start, [4000])
+spawn(Servy.HttpServer, :start, [4000])
+```
+
+Curl localhost to see server response.
+
+```shell
+$ curl http://localhost:4000/sensors
+
+# PID: #PID<0.199.0>: working on it!
+# Received request:
+#
+# GET /sensors HTTP/1.1
+# Host: localhost:4000
+# User-Agent: curl/7.49.0
+# Accept: */*
 ```
