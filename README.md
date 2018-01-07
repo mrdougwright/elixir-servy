@@ -29,6 +29,13 @@ $ iex -S mix
 > Servy.HttpServer.start(4000)
 ```
 
+In an iex session, you may need to spin up other servers first:
+```elixir
+Servy.FourOhFourCounter.start()
+Servy.PledgeServer.start()
+Servy.HttpServer.start(4000)
+```
+
 Or spawn the process within iex:
 
 ```elixir
