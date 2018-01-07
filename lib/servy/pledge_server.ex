@@ -56,9 +56,21 @@ defmodule Servy.PledgeServer do
     end
   end
 
-  defp send_pledge_to_service(_name, _amount) do
-    # Code goes here to send pledge to external service
-    {:ok, "pledge-#{:rand.uniform(1000)}"}
+  defp send_pledge_to_service(name, amount) do
+    url = "https://httparrot.herokuapp.com/post"
+    body = ~s({"name": #{name}, "amount": #{amount}})
+    headers = [{"Content-Type", "application/json"}]
+    resp = HTTPoison.post url, body, headers
+    handle_response(resp)
+  end
+
+  defp handle_response({:ok, %{status_code: 200, body: body}}) do
+    response = Poison.Parser.parse!(body)
+    {:ok, response}
+  end
+
+  defp handle_response({:error, %{reason: reason}}) do
+    {:error, reason}
   end
 
 end
