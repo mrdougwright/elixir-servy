@@ -19,10 +19,10 @@ defmodule Servy.Mixfile do
   end
 
   # Run "mix help deps" to learn about dependencies.
-  defp deps do
+  def deps do
     [
       {:poison, "~> 3.1"}, # json encoder from http://hex.pm
-      {:httpoison, "~> 0.12.0"} # http client for elixir
+      {:httpoison, "~> 1.0"} # http client for elixir
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
     ]
