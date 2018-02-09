@@ -2,19 +2,25 @@ defmodule Servy.PledgeServer do
 
   @name :pledge_server
 
-  use GenServer
+  use GenServer #, restart: :temporary # <- to override one
 
   defmodule State do
     defstruct cache_size: 3, pledges: []
   end
 
+  # full override, to customize GenServer function(s)
+  def child_spec(arg) do
+    %{id: __MODULE__, restart: :temporary, shutdown: 4000,
+      start: {__MODULE__, :start_link, [[]]}, type: :worker}
+  end
+
   # Client interface functions
 
-  def start do
+  def start_link(_arg) do
     IO.puts "Starting the pledge server..."
     # %State{} gets passed to init function below, by GenServer
     HTTPoison.start
-    GenServer.start(__MODULE__, %State{}, name: @name)
+    GenServer.start_link(__MODULE__, %State{}, name: @name)
   end
 
   def create_pledge(name, amount) do
