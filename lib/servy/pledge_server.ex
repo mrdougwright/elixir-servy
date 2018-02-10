@@ -2,16 +2,10 @@ defmodule Servy.PledgeServer do
 
   @name :pledge_server
 
-  use GenServer #, restart: :temporary # <- to override one
+  use GenServer
 
   defmodule State do
     defstruct cache_size: 3, pledges: []
-  end
-
-  # full override, to customize GenServer function(s)
-  def child_spec(arg) do
-    %{id: __MODULE__, restart: :temporary, shutdown: 4000,
-      start: {__MODULE__, :start_link, [[]]}, type: :worker}
   end
 
   # Client interface functions
