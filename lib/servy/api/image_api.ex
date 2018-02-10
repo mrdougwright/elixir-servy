@@ -10,7 +10,7 @@ defmodule Servy.ImageApi do
     {:ok, image_url}
   end
 
-  defp handle_response({:ok, %{status_code: status, body: body}}) do
+  defp handle_response({:ok, %{status_code: _status, body: body}}) do
     message = body |> Poison.Parser.parse! |> get_in(["message"])
     {:error, message}
   end

@@ -9,6 +9,7 @@ defmodule Servy.ServicesSupervisor do
   def init(:ok) do
     children = [
       Servy.PledgeServer,
+      Servy.FourOhFourCounter,
       {Servy.SensorServer, 60} #2nd value passed as arg to start_link func
     ]
 

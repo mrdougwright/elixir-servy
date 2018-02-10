@@ -16,6 +16,7 @@ defmodule Servy.HttpServer do
     # `reuseaddr: true` - allows reusing the address if the listener crashes
 
     IO.puts "\n🎧  Listening for connection requests on port #{port}...\n"
+    IO.puts "\n📺  http://localhost:#{port}\n"
 
     accept_loop(listen_socket)
   end
